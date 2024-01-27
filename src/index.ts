@@ -9,7 +9,7 @@ const bot = new Client({
 })
 
 bot.once('ready', () => {
-    console.log(`Logged in as ${bot.user.tag}!`)
+  console.log(`Logged in as ${bot.user.tag}!`)
 });
 
 bot.on('messageCreate', async message => {
@@ -31,31 +31,31 @@ bot.on('messageCreate', async message => {
 })
 
 function startServer(message: Message) {
-    exec('docker compose up', (error, stdout, stderr) => {
-        if (error) {
-            console.error(`exec error: ${error}`);
-            return message.reply(`Error executing docker compose up: ${error.message}`);
-        }
-        if (stderr) {
-            console.error(`stderr: ${stderr}`);
-            return message.reply(`docker compose up executed with errors: \`${stderr}\``);
-        }
-        message.reply(`docker compose up executed successfully: \`${stdout}\``);
-    });
+  exec('docker compose up -d', (error, stdout, stderr) => {
+    if (error) {
+      console.error(`exec error: ${error}`);
+      return message.reply(`Error executing docker compose up: ${error.message}`);
+    }
+    if (stderr) {
+      console.log(`stderr: ${stderr}`);
+      return message.reply(`logs: \`${stderr}\``);
+    }
+    message.reply(`docker compose up executed successfully: \`${stdout}\``);
+  });
 }
 
 function closeServer(message: Message) {
-    exec('docker compose up', (error, stdout, stderr) => {
-        if (error) {
-            console.error(`exec error: ${error}`);
-            return message.reply(`Error executing docker compose up: ${error.message}`);
-        }
-        if (stderr) {
-            console.error(`stderr: ${stderr}`);
-            return message.reply(`docker compose up executed with errors: \`${stderr}\``);
-        }
-        message.reply(`docker compose up executed successfully: \`${stdout}\``);
-    });
+  exec('docker compose down', (error, stdout, stderr) => {
+    if (error) {
+      console.error(`exec error: ${error}`);
+      return message.reply(`Error executing docker compose down: ${error.message}`);
+    }
+    if (stderr) {
+      console.log(`stderr: ${stderr}`);
+      return message.reply(`logs: \`${stderr}\``);
+    }
+    message.reply(`docker compose down executed successfully: \`${stdout}\``);
+  });
 }
 
 
