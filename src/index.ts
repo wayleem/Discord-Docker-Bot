@@ -33,28 +33,28 @@ bot.on('messageCreate', async message => {
 function startServer(message: Message) {
   exec('docker compose up -d', (error, stdout, stderr) => {
     if (error) {
-      console.error(`exec error: ${error}`);
-      return message.reply(`Error executing docker compose up: ${error.message}`);
+      console.error(`exec error: ${error}`)
+      return message.reply(`Error executing docker compose up: ${error.message}`)
     }
     if (stderr) {
-      console.log(`stderr: ${stderr}`);
-      return message.reply(`logs: \`${stderr}\``);
+      console.log(`stderr: ${stderr}`)
+      return message.reply(`logs: \`${stderr}\``)
     }
-    message.reply(`docker compose up executed successfully: \`${stdout}\``);
+    message.reply(`docker compose up executed successfully: \`${stdout}\``)
   });
 }
 
 function closeServer(message: Message) {
   exec('docker compose down', (error, stdout, stderr) => {
     if (error) {
-      console.error(`exec error: ${error}`);
-      return message.reply(`Error executing docker compose down: ${error.message}`);
+      console.error(`exec error: ${error}`)
+      return message.reply(`Error executing docker compose down: ${error.message}`)
     }
     if (stderr) {
-      console.log(`stderr: ${stderr}`);
-      return message.reply(`logs: \`${stderr}\``);
+      console.log(`stderr: ${stderr}`)
+      return message.reply(`logs: \`${stderr}\``)
     }
-    message.reply(`docker compose down executed successfully: \`${stdout}\``);
+    message.reply(`docker compose down executed successfully: \`${stdout}\``)
   });
 }
 
