@@ -24,6 +24,7 @@ bot.on('messageCreate', async message => {
     return
   }
 
+  /*
   if (message.author.bot) {
     return
   }
@@ -53,6 +54,7 @@ bot.on('messageCreate', async message => {
 
   commandProcessing.add(message.author.id)
 
+  */
   if (message.content.startsWith("!start")) {
     startServer(message)
   } else if (message.content.startsWith("!close")) {
