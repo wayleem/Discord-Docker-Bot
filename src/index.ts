@@ -30,6 +30,7 @@ bot.on('messageCreate', async message => {
 
   const userRecord = userCommandCounts.get(message.author.id)
   if (userRecord && Date.now() < userRecord.ignoreUntil) {
+    console.log("ignore")
     return
   }
 
@@ -38,6 +39,7 @@ bot.on('messageCreate', async message => {
   }
 
   if (!userRecord || Date.now() > userRecord.timestamp + cooldownAmount) {
+    console.log("ignoring " + message.author.displayName)
     userCommandCounts.set(message.author.id, { count: 1, timestamp: Date.now(), ignoreUntil: 0 })
   } else {
     userRecord.count++
