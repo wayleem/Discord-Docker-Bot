@@ -8,10 +8,11 @@ const bot = new Client({
   intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent]
 })
 
-const rateLimitMap = new Map<string, number[]>(); // Maps a user ID to an array of timestamps
-const commandThreshold = 3; // Number of commands to trigger the rate limit
-const rateLimitDuration = 30000; // Duration to ignore commands after hitting the rate limit (30 seconds)
-const commandCooldown = 5000; // Cooldown between commands (5 seconds)
+const rateLimitMap = new Map<string, number[]>()
+const silenceMap = new Map<string, number>()
+const commandThreshold = 3
+const rateLimitDuration = 30000
+const commandCooldown = 5000
 
 bot.once('ready', () => {
   console.log(`Logged in as ${bot.user.tag}!`)
@@ -24,16 +25,28 @@ bot.on('messageCreate', async message => {
 
   const now = Date.now()
   const timestamps = rateLimitMap.get(message.author.id) || []
+  const silenceTimestamp = silenceMap.get(message.author.id)
+
+  if (silenceTimestamp && now < silenceTimestamp) {
+    return
+  }
 
   if (timestamps.length >= commandThreshold) {
     const timeSinceLastCommand = now - timestamps[timestamps.length - 1]
     if (timeSinceLastCommand < rateLimitDuration) {
-      message.reply(`Ignoring user ${message.author.id} for ${timestamps.length}`)
+      if (!silenceTimestamp) {
+        message.reply(`${message.author.displayName}, you're sending commands too quickly. You will be ignored for 30 seconds.`)
+        silenceMap.set(message.author.id, now + rateLimitDuration)
+      }
       return
     }
     while (timestamps.length && now - timestamps[0] > commandCooldown) {
       timestamps.shift()
     }
+  }
+
+  if (silenceTimestamp) {
+    silenceMap.delete(message.author.id)
   }
 
   timestamps.push(now)
