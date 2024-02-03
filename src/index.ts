@@ -12,7 +12,7 @@ const rateLimitMap = new Map<string, number[]>()
 const silenceMap = new Map<string, number>()
 const commandThreshold = 3
 const rateLimitDuration = 30000
-const commandCooldown = 5000
+const commandCooldown = 3000
 
 bot.once('ready', () => {
   console.log(`Logged in as ${bot.user.tag}!`)
