@@ -4,57 +4,43 @@ import * as dotenv from 'dotenv'
 
 dotenv.config()
 
-const userCommandCounts = new Map<string, { count: number; timestamp: number; ignoreUntil: number }>()
-const cooldownAmount = 5000 // Cooldown period in milliseconds (5 seconds)
-const muteThreshold = 3 // Number of commands to trigger ignore
-const muteDuration = 60000 // Duration to ignore commands in milliseconds (60 seconds)
-const commandProcessing = new Set<string>()
-
 const bot = new Client({
   intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent]
 })
 
+const rateLimitMap = new Map<string, number[]>(); // Maps a user ID to an array of timestamps
+const commandThreshold = 3; // Number of commands to trigger the rate limit
+const rateLimitDuration = 30000; // Duration to ignore commands after hitting the rate limit (30 seconds)
+const commandCooldown = 5000; // Cooldown between commands (5 seconds)
+
 bot.once('ready', () => {
   console.log(`Logged in as ${bot.user.tag}!`)
-});
-
+})
 
 bot.on('messageCreate', async message => {
   if (!message.guild || !message.member?.permissions.has(PermissionFlagsBits.Administrator)) {
     return
   }
 
-  /*
-  if (message.author.bot) {
-    return
-  }
+  const now = Date.now()
+  const timestamps = rateLimitMap.get(message.author.id) || []
 
-  const userRecord = userCommandCounts.get(message.author.id)
-  if (userRecord && Date.now() < userRecord.ignoreUntil) {
-    console.log("ignore")
-    return
-  }
-
-  if (commandProcessing.has(message.author.id)) {
-    return
-  }
-
-  if (!userRecord || Date.now() > userRecord.timestamp + cooldownAmount) {
-    console.log("ignoring " + message.author.displayName)
-    userCommandCounts.set(message.author.id, { count: 1, timestamp: Date.now(), ignoreUntil: 0 })
-  } else {
-    userRecord.count++
-    userRecord.timestamp = Date.now()
-    if (userRecord.count >= muteThreshold) {
-      userRecord.ignoreUntil = Date.now() + muteDuration
-      return
+  // If the user has sent 3 commands in quick succession, check for rate limit
+  if (timestamps.length >= commandThreshold) {
+    const timeSinceLastCommand = now - timestamps[timestamps.length - 1]
+    if (timeSinceLastCommand < rateLimitDuration) {
+      return // Ignore the command
     }
-    userCommandCounts.set(message.author.id, userRecord)
+    // Remove expired timestamps
+    while (timestamps.length && now - timestamps[0] > commandCooldown) {
+      timestamps.shift()
+    }
   }
 
-  commandProcessing.add(message.author.id)
+  // Add the timestamp for the new command
+  timestamps.push(now)
+  rateLimitMap.set(message.author.id, timestamps)
 
-  */
   if (message.content.startsWith("!start")) {
     startServer(message)
   } else if (message.content.startsWith("!close")) {
