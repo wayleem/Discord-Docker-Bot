@@ -25,19 +25,17 @@ bot.on('messageCreate', async message => {
   const now = Date.now()
   const timestamps = rateLimitMap.get(message.author.id) || []
 
-  // If the user has sent 3 commands in quick succession, check for rate limit
   if (timestamps.length >= commandThreshold) {
     const timeSinceLastCommand = now - timestamps[timestamps.length - 1]
     if (timeSinceLastCommand < rateLimitDuration) {
-      return // Ignore the command
+      message.reply(`Ignoring user ${message.author.id} for ${timestamps.length}`)
+      return
     }
-    // Remove expired timestamps
     while (timestamps.length && now - timestamps[0] > commandCooldown) {
       timestamps.shift()
     }
   }
 
-  // Add the timestamp for the new command
   timestamps.push(now)
   rateLimitMap.set(message.author.id, timestamps)
 
